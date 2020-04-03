@@ -1,2 +1,2 @@
-# dosk
-Docker starter kit for Laravel based app
+# DoSK
+Docker Starter Kit for Laravel based app
