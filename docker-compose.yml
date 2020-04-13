@@ -1,0 +1,233 @@
+version: "3.3"
+services:
+  application:
+    image: ${CONTAINER_NAME_PREFIX}-phpcli
+    depends_on:
+      - phpfpm
+    build:
+      args:
+        SITE_PATH: /var/www/app/
+        PUID: ${WORKSPACE_UID}
+        USER_NAME: ${WORKSPACE_USER_NAME}
+      context: .
+      dockerfile: ./docker/php-cli/Dockerfile
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app/
+    networks:
+      app-net:
+        aliases:
+          - app
+
+  phpfpm:
+    image: ${CONTAINER_NAME_PREFIX}-phpfpm
+    build:
+      args:
+        NGINX_UID: ${UID}
+        NGINX_GID: ${GID}
+        SITE_PATH: /var/www/app/
+        FPM_SOCKET_PATH: /run/php-fpm/
+        CONFIG_PATH: /usr/local/etc/
+        CORES_FOR_COMPILATION: ${CORES_FOR_COMPILATION}
+      context: ./docker/php-fpm/
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - "phpFpmSocket:/run/php-fpm"
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app
+    networks:
+      app-net:
+        aliases:
+          - phpfpm
+
+  nginx:
+    image: ${CONTAINER_NAME_PREFIX}-nginx
+    depends_on:
+      - phpfpm
+    build:
+      args:
+        NGINX_UID: ${UID}
+        NGINX_GID: ${GID}
+        SITE_PATH: /var/www/app/
+        FPM_SOCKET_PATH: /run/php-fpm/
+        CONFIG_PATH: /etc/nginx/
+      context: ./docker/nginx/
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - "phpFpmSocket:/run/php-fpm"
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app
+    ports:
+      - "${NGINX_PORT}:80"
+    networks:
+      app-net:
+        aliases:
+          - nginx
+
+  redis:
+    image: redis:5.0
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      app-net:
+        aliases:
+          - redis
+
+  rabbitmq:
+    image: rabbitmq:3.8
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${RABBITMQ_EPMD_PORT}:4369"
+      - "${RABBITMQ_AMQP_TLS_PORT}:5671"
+      - "${RABBITMQ_AMQP_PORT}:5672"
+      - "${RABBITMQ_CLI_PORT}:25672"
+    networks:
+      app-net:
+        aliases:
+          - rabbitmq
+
+  elasticsearch:
+    image: elasticsearch:7.6.2
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.license.self_generated.type=basic"
+      - "TZ=${TZ}"
+    volumes:
+      - type: bind
+        source: ./data/elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "${ELASTIC_DEFAULT_PORT}:9200"
+      - "${ELASTIC_COMMUNICATION_PORT}:9300"
+    ulimits:
+      max_file_descriptors:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      app-net:
+        aliases:
+          - elasticsearch
+
+  kibana:
+    image: ${CONTAINER_NAME_PREFIX}-kibana
+    build:
+      context: ./docker/kibana/
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${KIBANA_PORT}:5601"
+    networks:
+      app-net:
+        aliases:
+          - kibana
+
+  logstash:
+    image: ${CONTAINER_NAME_PREFIX}-logstash
+    build:
+      context: ./docker/logstash/
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${LOGSTASH_DEFAULT_PORT}:5044"
+      - "${LOGSTASH_API_PORT}:9600"
+      - "${LOGSTASH_LOGS_PORT}:9601"
+    networks:
+      app-net:
+        aliases:
+          - logstash
+
+  mariadb:
+    image: ${CONTAINER_NAME_PREFIX}-mariadb
+    build:
+      context: ./docker/mariadb/
+    environment:
+      MYSQL_DUMP_URL: ${MYSQL_DUMP_URL}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - type: bind
+        source: ./data/mariadb
+        target: /var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      app-net:
+        aliases:
+          - mariadb
+
+  postgresql:
+    image: ${CONTAINER_NAME_PREFIX}-postgresql
+    restart: always
+    build:
+      context: ./docker/postgresql/
+    environment:
+      TZ: ${TZ}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - type: bind
+        source: ./data/postgresql
+        target: /var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      app-net:
+        aliases:
+          - postgre
+
+  mongo:
+    image: ${CONTAINER_NAME_PREFIX}-mongo
+    restart: always
+    build:
+      context: ./docker/mongo/
+    environment:
+      TZ: ${TZ}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - type: bind
+        source: ./data/mongodb
+        target: /var/lib/mongodb
+    ports:
+      - "${MONGO_PORT}:27017"
+    networks:
+      app-net:
+        aliases:
+          - mongo
+
+  memcached:
+    image: memcached
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${MEMCACHED_PORT}:11211"
+    networks:
+      app-net:
+        aliases:
+          - memcache
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  phpFpmSocket:
+
+networks:
+  app-net:
