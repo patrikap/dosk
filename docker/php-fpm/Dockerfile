@@ -16,7 +16,13 @@ RUN apt-get update -y && apt-get install -y \
     libcurl4-gnutls-dev \
     libssl-dev \
     libxml2-dev \
-    libonig-dev
+    libonig-dev \
+    libpq-dev
+#    zlib1g-dev \
+#    libicu-dev \
+#    g++
+
+RUN apt-get install -y postgresql-client postgis
 
 # конфигурируем исходники. набор необходимых пакетов для Laravel
 RUN docker-php-ext-configure bcmath && \
@@ -28,6 +34,8 @@ RUN docker-php-ext-configure bcmath && \
     docker-php-ext-configure pcntl && \
     docker-php-ext-configure pdo && \
     docker-php-ext-configure pdo_mysql && \
+    docker-php-ext-configure pdo_pgsql && \
+    docker-php-ext-configure pgsql && \
     docker-php-ext-configure tokenizer
 
 # компилируем и устанавливаем
@@ -42,7 +50,10 @@ RUN docker-php-ext-install -j$CORES_FOR_COMPILATION \
     pcntl \
     pdo \
     pdo_mysql \
-    tokenizer
+    tokenizer \
+    pgsql \
+    pdo_pgsql
+
 
 # ставим пару расширений, другим образом
 RUN pecl install xdebug igbinary \
@@ -58,11 +69,14 @@ RUN pecl install xdebug igbinary \
     && ./configure --enable-redis-igbinary=yes --enable-redis-lzf=yes --enable-redis-zstd=no \
     && make -j$CORES_FOR_COMPILATION \
     && make install \
+#    && pecl install memcached \
     && docker-php-ext-enable lzf igbinary xdebug redis
+    #memcached
 
 
 # удаляем пакеты с исходниками
-RUN apt-get -y remove libxml2-dev libcurl4-gnutls-dev libssl-dev libonig-dev
+RUN apt-get -y remove libxml2-dev libcurl4-gnutls-dev libssl-dev libonig-dev libpq-dev
+#zlib1g-dev libicu-dev g++
 
 # копируем конфиги PHP
 COPY php-fpm.d/* $CONFIG_PATH/php-fpm.d/

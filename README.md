@@ -134,6 +134,9 @@ $ rm /tmp/dump.zip
     * поддержку node.js
     * поддержку `crontab`
 * изолировать контейнер `php-cli`
+* добавить в php-fpm
+    * AMQP, rabbitmq
+    * memcached 
 * `to be continue...`
 
 ## Changelog

@@ -5,7 +5,7 @@ ARG SITE_PATH
 ENV CRON_TASKS /etc/cron.d/tasks
 ENV CRON_LOG /var/log/cron.log
 
-RUN apt-get update; apt-get install -y --no-install-recommends cron; rm -rf /var/lib/apt/lists/*
+RUN apt-get update; apt-get install -y git; apt-get install -y --no-install-recommends cron; rm -rf /var/lib/apt/lists/*
 
 # ADD crontab $CRON_TASKS
 # RUN chmod 0644 $CRON_TASKS; touch $CRON_LOG
