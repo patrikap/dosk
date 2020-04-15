@@ -45,6 +45,77 @@ services:
         aliases:
           - phpfpm
 
+  phpfpm56:
+    image: ${CONTAINER_NAME_PREFIX}-phpfpm56
+    build:
+      args:
+        NGINX_UID: ${UID}
+        NGINX_GID: ${GID}
+        SITE_PATH: /var/www/app/
+        FPM_SOCKET_PATH: /run/php-fpm/
+        CONFIG_PATH: /usr/local/etc/
+        CORES_FOR_COMPILATION: ${CORES_FOR_COMPILATION}
+      context: ./docker/php-fpm56/
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - "phpFpmSocket56:/run/php-fpm"
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app
+    networks:
+      app-net:
+        aliases:
+          - phpfpm56
+
+  application56:
+    image: ${CONTAINER_NAME_PREFIX}-phpcli56
+    depends_on:
+      - phpfpm56
+    build:
+      args:
+        SITE_PATH: /var/www/app/
+        PUID: ${WORKSPACE_UID}
+        USER_NAME: ${WORKSPACE_USER_NAME}
+      context: .
+      dockerfile: ./docker/php-cli56/Dockerfile
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app/
+    networks:
+      app-net:
+        aliases:
+          - app56
+
+  nginx56:
+    image: ${CONTAINER_NAME_PREFIX}-nginx56
+    depends_on:
+      - application56
+    build:
+      args:
+        NGINX_UID: ${UID}
+        NGINX_GID: ${GID}
+        SITE_PATH: /var/www/app/
+        FPM_SOCKET_PATH: /run/php-fpm/
+        CONFIG_PATH: /etc/nginx/
+      context: ./docker/nginx56/
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - "phpFpmSocket56:/run/php-fpm"
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app
+    ports:
+      - "${NGINX_PORT}88:80"
+    networks:
+      app-net:
+        aliases:
+          - nginx56
+
   nginx:
     image: ${CONTAINER_NAME_PREFIX}-nginx
     depends_on:
@@ -228,6 +299,7 @@ services:
 
 volumes:
   phpFpmSocket:
+  phpFpmSocket56:
 
 networks:
   app-net:

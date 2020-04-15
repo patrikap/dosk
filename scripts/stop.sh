@@ -8,7 +8,7 @@ read_var() {
     echo ${VAR[1]}
 }
 ### CONFIG
-LOCAL_CONTAINERS=$(read_var LOCAL_CONTAINERS .env)
 
 # запускаем необходимые контейнеры для локальной разработки
-docker-compose -f docker-compose.yml up -d $LOCAL_CONTAINERS
+docker-compose -f docker-compose.yml down
+docker-compose -f docker-compose.yml stop
