@@ -17,8 +17,8 @@ RUN apt-get update -y && apt-get install -y \
     libssl-dev \
     libxml2-dev \
     libonig-dev \
-    libpq-dev
-#    zlib1g-dev \
+    libpq-dev \
+    zlib1g-dev
 #    libicu-dev \
 #    g++
 
@@ -36,6 +36,8 @@ RUN docker-php-ext-configure bcmath && \
     docker-php-ext-configure pdo_mysql && \
     docker-php-ext-configure pdo_pgsql && \
     docker-php-ext-configure pgsql && \
+    docker-php-ext-configure zip && \
+    docker-php-ext-configure opcache && \
     docker-php-ext-configure tokenizer
 
 # компилируем и устанавливаем
@@ -52,6 +54,8 @@ RUN docker-php-ext-install -j$CORES_FOR_COMPILATION \
     pdo_mysql \
     tokenizer \
     pgsql \
+    zip \
+    opcache \
     pdo_pgsql
 
 #xdebug igbinary
@@ -90,6 +94,12 @@ RUN pecl install  \
 #     memcached
     #redis
      #memcached
+
+RUN apt-get update && apt-get install -y libssl-dev libmemcached-dev zlib1g-dev && rm -rf /var/lib/apt/lists/*
+
+RUN pecl install mongo-1.6.14 \
+    && pecl install memcached-2.2.0 \
+    && docker-php-ext-enable mongo memcached
 
 
 # удаляем пакеты с исходниками
