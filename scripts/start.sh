@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# переходим науровень выше
-cd ../
 ### READ .ENV
 read_var() {
     VAR=$(grep $1 $2 | xargs)
