@@ -7,4 +7,4 @@ read_var() {
 }
 
 ### пересобираем нужный образ тут application
-docker-compose -f docker-compose.yml build --no-cache --force-rm  nginx56
+docker-compose -f docker-compose.yml build --no-cache --force-rm  application56

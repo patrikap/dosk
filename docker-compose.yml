@@ -272,7 +272,8 @@ services:
     volumes:
       - type: bind
         source: ./data/mongodb
-        target: /var/lib/mongodb
+        target: /data/db
+#        target: /var/lib/mongodb
     ports:
       - "${MONGO_PORT}:27017"
     networks:
