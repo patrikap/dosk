@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APP=cdek
+APP=dosk
 
 IMAGE_NAME=$APP-mariadb
 CONTAINER_NAME=$APP-mariadb

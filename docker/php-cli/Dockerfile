@@ -1,4 +1,4 @@
-FROM cdek-phpfpm
+FROM dosk-phpfpm
 
 ARG SITE_PATH
 
@@ -34,6 +34,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
         --install-dir=/usr/local/bin && \
         echo "alias composer='composer'" >> /root/.bashrc && \
         composer --version
+
+# Install NodeJs
+RUN apt-get update; apt-get install -y nodejs npm;
 
 #USER container_user
 #COPY ./composer.json $SITE_PATH/composer.json

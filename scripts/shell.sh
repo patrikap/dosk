@@ -9,4 +9,4 @@ read_var() {
 USER=$(read_var WORKSPACE_USER_NAME .env)
 
 # коннектимся к контейнеру докера
-docker-compose -f docker-compose.yml exec --user ${USER} application56 bash
+docker-compose -f docker-compose.yml exec --user ${USER} application bash
