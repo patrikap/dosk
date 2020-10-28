@@ -13,6 +13,8 @@ services:
       dockerfile: ./docker/php-cli/Dockerfile
     environment:
       TZ: ${TZ}
+      XDEBUG_CONFIG: "remote_host=${DEBUG_IP} remote_port=${DEBUG_PORT} idekey=${DEBUG_IDE_KEY}"
+      PHP_IDE_CONFIG: "serverName=${DEBUG_IDE_KEY}"
     volumes:
       - type: bind
         source: ${APPLICATION}
@@ -21,6 +23,8 @@ services:
       app-net:
         aliases:
           - app
+    extra_hosts:
+      - 'uc.lc:${D_H}'
 
   phpfpm:
     image: ${CONTAINER_NAME_PREFIX}-phpfpm
@@ -266,14 +270,14 @@ services:
       context: ./docker/mongo/
     environment:
       TZ: ${TZ}
-#      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-#      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      #      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      #      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     volumes:
       - type: bind
         source: ./data/mongodb
         target: /data/db
-#        target: /var/lib/mongodb
+    #        target: /var/lib/mongodb
     ports:
       - "${MONGO_PORT}:27017"
     networks:

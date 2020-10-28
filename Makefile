@@ -21,3 +21,6 @@ logs:
 
 rebuild:
 		@bash scripts/rebuild.sh
+
+perm:
+		@bash scripts/perm.sh

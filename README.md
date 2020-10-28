@@ -139,6 +139,9 @@ $ rm /tmp/dump.zip
     * memcached 
 * `to be continue...`
 
+## THANKS
+* [ПУЦ](https://vc.ru/dev/158897-sreda-razrabotki-php-na-baze-docker)
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.

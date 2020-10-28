@@ -17,12 +17,14 @@ RUN apt-get update -y && apt-get install -y \
     libssl-dev \
     libxml2-dev \
     libonig-dev \
-    libpq-dev
-#    zlib1g-dev \
-#    libicu-dev \
-#    g++
+    libzip-dev \
+    zip \
+    libpq5 \
+    libpq-dev \
+    librabbitmq-dev \
+    libssh-dev
 
-RUN apt-get install -y postgresql-client postgis
+RUN apt-get install -y postgresql-client
 
 # конфигурируем исходники. набор необходимых пакетов для Laravel
 RUN docker-php-ext-configure bcmath && \
@@ -36,12 +38,14 @@ RUN docker-php-ext-configure bcmath && \
     docker-php-ext-configure pdo_mysql && \
     docker-php-ext-configure pdo_pgsql && \
     docker-php-ext-configure pgsql && \
+    docker-php-ext-configure zip && \
     docker-php-ext-configure tokenizer
 
 # компилируем и устанавливаем
 ARG CORES_FOR_COMPILATION
 RUN docker-php-ext-install -j$CORES_FOR_COMPILATION \
     bcmath  \
+    sockets  \
     ctype \
     curl \
     fileinfo \
@@ -52,7 +56,8 @@ RUN docker-php-ext-install -j$CORES_FOR_COMPILATION \
     pdo_mysql \
     tokenizer \
     pgsql \
-    pdo_pgsql
+    pdo_pgsql \
+    zip
 
 
 # ставим пару расширений, другим образом
@@ -70,7 +75,11 @@ RUN pecl install xdebug igbinary \
     && make -j$CORES_FOR_COMPILATION \
     && make install \
 #    && pecl install memcached \
-    && docker-php-ext-enable lzf igbinary xdebug redis
+    && docker-php-ext-enable lzf igbinary xdebug redis \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp
     #memcached
 
 
