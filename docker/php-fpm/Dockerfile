@@ -83,7 +83,7 @@ RUN pecl install xdebug igbinary \
     && make install \
 #    && pecl install memcached \
     && docker-php-ext-enable lzf igbinary xdebug redis \
-    && pecl install mongodb \
+    && pecl install mongodb-1.17.0 \
     && docker-php-ext-enable mongodb \
     && pecl install amqp \
     && docker-php-ext-enable amqp

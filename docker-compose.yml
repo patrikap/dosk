@@ -32,8 +32,8 @@ services:
       dockerfile: ./docker/php-cli/Dockerfile
     environment:
       TZ: ${TZ}
-      XDEBUG_CONFIG: "remote_host=${DEBUG_IP} remote_port=${DEBUG_PORT} idekey=${DEBUG_IDE_KEY}"
-      PHP_IDE_CONFIG: "serverName=${DEBUG_IDE_KEY}"
+#      XDEBUG_CONFIG: "remote_host=${DEBUG_IP} remote_port=${DEBUG_PORT} idekey=${DEBUG_IDE_KEY}"
+#      PHP_IDE_CONFIG: "serverName=${DEBUG_IDE_KEY}"
     volumes:
       - type: bind
         source: ${APPLICATION}

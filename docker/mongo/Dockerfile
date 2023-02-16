@@ -1,3 +1,3 @@
-FROM mongo:3.2
+FROM mongo:3.6
 
 COPY mongod.conf /etc/mongod.conf
