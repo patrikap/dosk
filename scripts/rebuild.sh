@@ -7,4 +7,6 @@ read_var() {
 }
 
 ### пересобираем нужный образ тут application
-docker-compose -f docker-compose.yml build --no-cache --force-rm  application
+# docker-compose -f docker-compose.yml build --no-cache --force-rm  phpfpm application
+# docker-compose -f docker-compose.yml build --no-cache --force-rm application
+docker-compose -f docker-compose.yml build --no-cache --force-rm  nginx

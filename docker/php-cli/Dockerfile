@@ -43,4 +43,8 @@ RUN apt-get update; apt-get install -y nodejs npm;
 #RUN composer install --prefer-source --no-interaction
 #RUN chmod +x ${SITE_PATH}
 
+RUN apt-get install -y supervisor; rm -rf /var/lib/apt/lists/*
+
+CMD ["/usr/bin/supervisord"]
+
 ENTRYPOINT cron; tail -f /dev/stdout

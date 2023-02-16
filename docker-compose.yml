@@ -1,5 +1,24 @@
 version: "3.3"
 services:
+  supervisor:
+    image: ${CONTAINER_NAME_PREFIX}-supervisor
+    build:
+      context: .
+      dockerfile: ./docker/supervisor/Dockerfile
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - type: bind
+        source: ./docker/supervisor/conf.d/
+        target: /etc/supervisor/conf.d/
+      - type: bind
+        source: ${APPLICATION}
+        target: /var/www/app/
+    networks:
+      app-net:
+        aliases:
+          - phpfpm
+
   application:
     image: ${CONTAINER_NAME_PREFIX}-phpcli
     depends_on:
@@ -19,12 +38,19 @@ services:
       - type: bind
         source: ${APPLICATION}
         target: /var/www/app/
+      - type: bind
+        source: ./docker/supervisor/conf.d/
+        target: /etc/supervisor/conf.d/
+      - type: bind
+        source: ./log/supervisor/
+        target: /var/log/supervisor/
     networks:
       app-net:
         aliases:
           - app
     extra_hosts:
       - 'uc.lc:${D_H}'
+      - 'ucpl.lc:${D_H}'
 
   phpfpm:
     image: ${CONTAINER_NAME_PREFIX}-phpfpm
@@ -254,7 +280,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - type: bind
-        source: ./data/postgresql
+        source: ./data/postgresql13
         target: /var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT}:5432"
@@ -301,6 +327,16 @@ services:
     restart: always
     ports:
       - 8080:8080
+
+  ray:
+    image: butschster/ray-server
+    restart: always
+    ports:
+      - 23517:8000
+    networks:
+      app-net:
+        aliases:
+          - ray
 
 volumes:
   phpFpmSocket:

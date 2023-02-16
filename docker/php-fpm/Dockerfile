@@ -22,7 +22,8 @@ RUN apt-get update -y && apt-get install -y \
     libpq5 \
     libpq-dev \
     librabbitmq-dev \
-    libssh-dev
+    libssh-dev  \
+    libgd-dev
 
 RUN apt-get install -y postgresql-client
 
@@ -59,6 +60,12 @@ RUN docker-php-ext-install -j$CORES_FOR_COMPILATION \
     pdo_pgsql \
     zip
 
+# конфигурируем ГД
+RUN docker-php-ext-configure gd
+# --with-gd --with-webp-dir --with-jpeg-dir \
+#    --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir \
+#    --enable-gd-native-ttf
+RUN docker-php-ext-install -j$CORES_FOR_COMPILATION gd
 
 # ставим пару расширений, другим образом
 RUN pecl install xdebug igbinary \

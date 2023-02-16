@@ -10,7 +10,7 @@ ARG FPM_SOCKET_PATH
 RUN rm $CONFIG_PATH/conf.d/*; mkdir -p $FPM_SOCKET_PATH $SITE_PATH; \
     groupmod -g $NGINX_UID nginx && usermod -u $NGINX_UID -g $NGINX_GID nginx
 
-COPY conf.d/* $CONFIG_PATH/conf.d/
+COPY conf.d/*.conf $CONFIG_PATH/conf.d/
 
 WORKDIR $SITE_PATH
 
